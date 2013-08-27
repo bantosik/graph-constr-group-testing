@@ -49,3 +49,16 @@ class Test(unittest.TestCase):
         self.assertEquals(path_tester.get_negative_queries(), 1, "Should be one negative queries got %d" % (path_tester.get_negative_queries(),))
         self.assertEquals(path_tester.get_all_queries(), 3, "Should be 3 queries in total got %d" % (path_tester.get_all_queries(),))
         
+        
+    def test_brute_force_solver(self):
+        g = problem_io.read_problem_from_file("test_data/test1.json")
+        solver = gt.BruteForceSolver(g)
+        solution = solver.solve()
+        stats = solution[1]
+        faulty_set = solution[0] 
+        self.assertEquals(faulty_set, g.faulty_set, "Should find all nodes from faulty set %s, got only %s" % 
+                          (g.faulty_set, faulty_set))
+        self.assertEquals(stats.get_all_queries(), 8, "Should have 8 queries in total got %d" % (stats.get_all_queries(),))
+        self.assertEquals(stats.get_positive_queries(), 7, "Should have 7 positive queries in total got %d" % (stats.get_positive_queries(),))
+        self.assertEquals(stats.get_negative_queries(), 1, "Should have 1 positive queries in total got %d" % (stats.get_negative_queries(),))
+        
