@@ -2,8 +2,8 @@ import unittest
 
 import networkx as nx
 
-from graph_constr_group_testing import problem_json_io as problem_io
-from graph_constr_group_testing import graph_constr_group_testing as gt
+from graph_constr_group_testing import problem_json_io as problem_io, base_types, brute_force_solver, test_graph_generator
+
 
 def graph_equal(g1, g2):
     return set(g1.edges_iter()) == set(g2.edges_iter())
@@ -34,8 +34,8 @@ class Test(unittest.TestCase):
 
     def test_path_tester(self):
         g = problem_io.read_problem_from_file("test_data/test1.json")
-        stats = gt.TestStatistics()
-        path_tester = gt.PathTester(g.faulty_set, stats)
+        stats = base_types.TestStatistics()
+        path_tester = base_types.PathTester(g.faulty_set, stats)
         p1 = ["2","4","6"]
         p2 = ["1","4","6"]
         p3 = ["2","3","6"]
@@ -52,7 +52,7 @@ class Test(unittest.TestCase):
 
     def test_brute_force_solver(self):
         g = problem_io.read_problem_from_file("test_data/test1.json")
-        solver = gt.BruteForceSolver(g)
+        solver = brute_force_solver.BruteForceSolver(g)
         solution = solver.solve()
         stats = solution[1]
         faulty_set = solution[0]
@@ -61,6 +61,35 @@ class Test(unittest.TestCase):
         self.assertEquals(stats.get_all_queries(), 8, "Should have 8 queries in total got %d" % (stats.get_all_queries(),))
         self.assertEquals(stats.get_positive_queries(), 7, "Should have 7 positive queries in total got %d" % (stats.get_positive_queries(),))
         self.assertEquals(stats.get_negative_queries(), 1, "Should have 1 positive queries in total got %d" % (stats.get_negative_queries(),))
+
+    def test_is_dag_connected(self):
+        g = nx.DiGraph()
+        g.add_edge(1,2)
+        g.add_edge(2,3)
+        g.add_edge(1,3)
+        g.add_edge(4,5)
+        self.assertFalse(nx.is_weakly_connected(g))
+
+    def test_is_not_consistent_dag_weakly_connected(self):
+        g = nx.DiGraph()
+        g.add_edge(1,2)
+        g.add_edge(1,3)
+        self.assertTrue(nx.is_weakly_connected(g))
+
+    def test_is_not_consistent_dag_marked_not_consistent(self):
+        g = nx.DiGraph()
+        g.add_edge(1,2)
+        g.add_edge(1,3)
+        with self.assertRaises(test_graph_generator.TestGraphException):
+            test_graph_generator.get_start_stop_vertex(g)
+
+    def test_is_consistent_dag_marked_consistent(self):
+        g = nx.DiGraph()
+        g.add_edge(1,2)
+        g.add_edge(1,3)
+        g.add_edge(2,4)
+        g.add_edge(3,4)
+        self.assertEqual(test_graph_generator.get_start_stop_vertex(g), (1,4))
 
 if __name__ == "__main__":
     pass
