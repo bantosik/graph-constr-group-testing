@@ -2,12 +2,20 @@ import json
 import networkx as nx
 from graph_constr_group_testing import base_types
 
+SOURCE_NODE_TAG = 'source_node'
+SINK_NODE_TAG = 'sink_node'
+EDGES_TAG = 'edges'
+
+DESCRIPTION_TAG = 'description'
+GRAPH_TAG = 'graph'
+NODES_TAG = 'faulty_nodes'
+
 
 def read_problem_from_file(f):
     data = json.load(f)
-    faulty_set = set(data['faulty_nodes'])
-    problem_graph = _create_problem_graph(data['graph'])
-    description = "".join(data.get('description', ''))
+    faulty_set = set(data[NODES_TAG])
+    problem_graph = _create_problem_graph(data[GRAPH_TAG])
+    description = "".join(data.get(DESCRIPTION_TAG, ''))
     problem = base_types.Problem(problem_graph, faulty_set, description)
     return problem
 
@@ -22,15 +30,16 @@ def _serialize_graph_to_dict(problem_graph):
     source = str(problem_graph.source)
     sink = str(problem_graph.sink)
     edges = {str(k): [str(key) for key in v.keys()] for k,v in g.adj.iteritems()}
-    graph_repr = {'edges': edges, 'source_node': source, 'sink_node': sink}
+    graph_repr = {EDGES_TAG: edges, SOURCE_NODE_TAG: source, SINK_NODE_TAG: sink}
     return graph_repr
 
 
 def write_problem_to_file(problem, file):
-    description = [problem.description]
     faulty_set = list(str(node) for node in problem.faulty_set)
     graph = _serialize_graph_to_dict(problem.problem_graph)
-    repr = {'graph': graph, 'faulty_nodes': faulty_set, 'description': description}
+    repr = {GRAPH_TAG: graph, NODES_TAG: faulty_set}
+    if problem.description is not None:
+        repr[DESCRIPTION_TAG] = [problem.description]
     json.dump(repr, file)
 
 
@@ -39,8 +48,8 @@ def write_problem_to_file_of_name(problem, filename):
         return write_problem_to_file(problem, f)
 
 def _create_problem_graph(data_source):
-    graph = nx.DiGraph(data_source['edges'])
-    source = data_source['source_node']
-    sink = data_source['sink_node']
+    graph = nx.DiGraph(data_source[EDGES_TAG])
+    source = data_source[SOURCE_NODE_TAG]
+    sink = data_source[SINK_NODE_TAG]
     problem_graph = base_types.ProblemGraph(graph, source, sink)
     return problem_graph
