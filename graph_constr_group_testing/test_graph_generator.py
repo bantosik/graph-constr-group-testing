@@ -46,7 +46,7 @@ def generate_connected_dag(n):
 
 def faulty_nodes(problemGraph, d):
     normalNodes = [node for node in problemGraph.graph.nodes_iter() if not node in [problemGraph.source, problemGraph.sink]]
-    return random.sample(normalNodes, d)
+    return set(random.sample(normalNodes, d))
 
 
 

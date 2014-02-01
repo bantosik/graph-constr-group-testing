@@ -1,3 +1,4 @@
+import StringIO
 import unittest
 
 import networkx as nx
@@ -26,14 +27,28 @@ class Test(unittest.TestCase):
 
 
     def test_read_problem_from_file(self):
-        g = problem_io.read_problem_from_file("test_data/test1.json")
+        g = problem_io.read_problem_from_file_of_name("test_data/test1.json")
         self.assertEquals(g.faulty_set, {"1","3","5"}, "Faulty set read from problem description %s" % (g.faulty_set,))
         self.assertTrue(graph_equal(g.problem_graph.graph, self.problem1_graph), "should get right graph")
         self.assertEquals(g.problem_graph.source, "START", "Source should be START but is %s" % (g.problem_graph.source))
         self.assertEquals(g.problem_graph.sink, "END", "Source should be START but is %s" % (g.problem_graph.sink))
 
+    def test_write_problem_to_file(self):
+        g = nx.DiGraph()
+        g.add_edge(1,2)
+        g.add_edge(1,3)
+        g.add_edge(2,4)
+        g.add_edge(3,4)
+        start, stop = 1, 4
+        graph = base_types.ProblemGraph(g, start, stop)
+        faulty_nodes = {2,}
+        problem = base_types.Problem(graph, faulty_nodes, "Description of a problem")
+        f = StringIO.StringIO()
+        problem_io.write_problem_to_file(problem, f)
+        self.assertEqual(f.getvalue(), """{"graph": {"sink_node": "4", "edges": {"1": ["2", "3"], "3": ["4"], "2": ["4"], "4": []}, "source_node": "1"}, "faulty_nodes": ["2"], "description": ["Description of a problem"]}""")
+
     def test_path_tester(self):
-        g = problem_io.read_problem_from_file("test_data/test1.json")
+        g = problem_io.read_problem_from_file_of_name("test_data/test1.json")
         stats = base_types.TestStatistics()
         path_tester = base_types.PathTester(g.faulty_set, stats)
         p1 = ["2","4","6"]
@@ -51,7 +66,7 @@ class Test(unittest.TestCase):
 
 
     def test_brute_force_solver(self):
-        g = problem_io.read_problem_from_file("test_data/test1.json")
+        g = problem_io.read_problem_from_file_of_name("test_data/test1.json")
         solver = brute_force_solver.BruteForceSolver(g)
         solution = solver.solve()
         stats = solution[1]
