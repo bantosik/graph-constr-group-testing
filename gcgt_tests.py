@@ -45,7 +45,7 @@ class Test(unittest.TestCase):
         problem = base_types.Problem(graph, faulty_nodes, "Description of a problem")
         f = StringIO.StringIO()
         problem_io.write_problem_to_file(problem, f)
-        self.assertEqual(f.getvalue(), """{"graph": {"sink_node": "4", "edges": {"1": ["2", "3"], "3": ["4"], "2": ["4"], "4": []}, "source_node": "1"}, "faulty_nodes": ["2"], "description": ["Description of a problem"]}""")
+        self.assertEqual(f.getvalue(), """{"graph": {"sink_node": "4", "edges": {"1": ["2", "3"], "3": ["4"], "2": ["4"], "4": []}, "source_node": "1"}, "version": "0.1", "type": "group testing problem", "description": ["Description of a problem"], "faulty_nodes": ["2"]}""")
 
     def test_path_tester(self):
         g = problem_io.read_problem_from_file_of_name("test_data/test1.json")
@@ -67,7 +67,9 @@ class Test(unittest.TestCase):
 
     def test_brute_force_solver(self):
         g = problem_io.read_problem_from_file_of_name("test_data/test1.json")
-        solver = brute_force_solver.BruteForceSolver(g)
+        statistics = base_types.TestStatistics()
+        tester = base_types.PathTester(g.faulty_set, statistics)
+        solver = brute_force_solver.BruteForceSolver(g, tester, statistics)
         solution = solver.solve()
         stats = solution[1]
         faulty_set = solution[0]

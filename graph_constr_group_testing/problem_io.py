@@ -1,0 +1,2 @@
+class NotGroupTestingDescriptionFile(Exception):
+    pass

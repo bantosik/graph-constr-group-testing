@@ -6,6 +6,9 @@ __author__ = 'bartek'
 Problem = collections.namedtuple("Problem", ["problem_graph", "faulty_set", "description"])
 ProblemGraph = collections.namedtuple("ProblemGraph", ["graph", "source", "sink"])
 
+def size_of_problem(problem):
+    return problem.problem_graph.graph.number_of_nodes() - 2
+
 class PathTester(object):
     def __init__(self, faulty_set, stats):
         self.faulty_set = faulty_set
@@ -46,3 +49,8 @@ class TestStatistics(object):
 
     def get_number_of_runs(self):
         return self.number_of_runs
+
+    def set_state(self, state):
+        self.state = state
+
+
