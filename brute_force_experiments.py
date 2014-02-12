@@ -1,8 +1,8 @@
 import collections
-from graph_constr_group_testing import run_simple_experiment, brute_force_solver, interface, base_types
+from graph_constr_group_testing import run_simple_experiment, brute_force_solver, base_types
 
 
-class SimpleExperimentStats(interface.ExperimentStatistics):
+class SimpleExperimentStats(base_types.ExperimentStatistics):
     def verify(self, result, faulty_set):
         return result == faulty_set
 

@@ -1,27 +1,19 @@
 """Module contains basic solver and statistic gathering utility classes"""
 
 import collections
+from graph_constr_group_testing import base_types
 
 
-class BruteForceSolver(object):
-    def __init__(self, problem_description, tester, statistics):
-        """
-        :type problem_description: Problem
-        """
-        self.problem_description = problem_description
-        self.graph = self.problem_description.problem_graph.graph
-        self.source = self.problem_description.problem_graph.source
-        self.sink = self.problem_description.problem_graph.sink
-        self.statistics = statistics
-        self.tester = tester
-
+class BruteForceSolver(base_types.Solver):
+    def __init__(self, problem_description, tester):
+        super(BruteForceSolver, self).__init__(problem_description, tester)
         self.analysis_state = BruteForceSolver.SimpleStateAnalyser(self.graph.nodes_iter())
 
     def solve(self):
         for path in generate_paths(self.graph, self.source, self.sink):
             [result] = self.tester.test_paths([path])
             self.analysis_state.put_result(result, path)
-        return self.analysis_state.get_positive_elements(), self.statistics
+        return self.analysis_state.get_positive_elements()
 
     class SimpleStateAnalyser(object):
         def __init__(self, nodes_iterator):

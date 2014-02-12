@@ -3,7 +3,7 @@ import unittest
 
 import networkx as nx
 
-from graph_constr_group_testing import problem_json_io as problem_io, base_types, brute_force_solver, test_graph_generator
+from graph_constr_group_testing import problem_json_io as problem_io, base_types, brute_force_solver, test_graph_generator, non_overlapping_path_tester
 
 
 def graph_equal(g1, g2):
@@ -50,7 +50,7 @@ class Test(unittest.TestCase):
     def test_path_tester(self):
         g = problem_io.read_problem_from_file_of_name("test_data/test1.json")
         stats = base_types.TestStatistics()
-        path_tester = base_types.NonOverlappingPathTester(g.faulty_set, stats)
+        path_tester = non_overlapping_path_tester.NonOverlappingPathTester(g.faulty_set, stats)
         p1 = ["2","4","6"]
         p2 = ["1","4","6"]
         p3 = ["2","3","6"]
@@ -68,16 +68,14 @@ class Test(unittest.TestCase):
     def test_brute_force_solver(self):
         g = problem_io.read_problem_from_file_of_name("test_data/test1.json")
         statistics = base_types.TestStatistics()
-        tester = base_types.NonOverlappingPathTester(g.faulty_set, statistics)
-        solver = brute_force_solver.BruteForceSolver(g, tester, statistics)
-        solution = solver.solve()
-        stats = solution[1]
-        faulty_set = solution[0]
+        tester = non_overlapping_path_tester.NonOverlappingPathTester(g.faulty_set, statistics)
+        solver = brute_force_solver.BruteForceSolver(g, tester)
+        faulty_set = solver.solve()
         self.assertEquals(faulty_set, g.faulty_set, "Should find all nodes from faulty set %s, got only %s" %
                           (g.faulty_set, faulty_set))
-        self.assertEquals(stats.get_all_queries(), 8, "Should have 8 queries in total got %d" % (stats.get_all_queries(),))
-        self.assertEquals(stats.get_positive_queries(), 7, "Should have 7 positive queries in total got %d" % (stats.get_positive_queries(),))
-        self.assertEquals(stats.get_negative_queries(), 1, "Should have 1 positive queries in total got %d" % (stats.get_negative_queries(),))
+        self.assertEquals(statistics.get_all_queries(), 8, "Should have 8 queries in total got %d" % (statistics.get_all_queries(),))
+        self.assertEquals(statistics.get_positive_queries(), 7, "Should have 7 positive queries in total got %d" % (statistics.get_positive_queries(),))
+        self.assertEquals(statistics.get_negative_queries(), 1, "Should have 1 positive queries in total got %d" % (statistics.get_negative_queries(),))
 
     def test_is_dag_connected(self):
         g = nx.DiGraph()

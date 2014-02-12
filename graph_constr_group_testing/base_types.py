@@ -9,48 +9,58 @@ ProblemGraph = collections.namedtuple("ProblemGraph", ["graph", "source", "sink"
 def size_of_problem(problem):
     return problem.problem_graph.graph.number_of_nodes() - 2
 
-class NonOverlappingPathTester(object):
-    def __init__(self, faulty_set, stats):
-        """
-        :param faulty_set: set of faulty elements. Existence of it will be tested in test_paths
-        :type faulty_set: set
-        :param stats: object to which various aspects of computation will be reported
-        :type stats: TestStatistics
-        """
-        self.faulty_set = faulty_set
-        self.stats = stats
 
-    def test_paths(self, paths):
-        results = []
-        for path in paths:
-            result = any((x in self.faulty_set) for x in path)
-            results.append(result)
-            if result:
-                self.stats.inc_positive_query()
-            else:
-                self.stats.inc_negative_query()
-        self.stats.end_run()
-        return results
+from abc import abstractmethod, ABCMeta
 
 
+class ExperimentStatistics(object):
+    """
+    Maintains statistics related with the experiment, for each problem and solver statistics object is gathered
+    """
+    __metaclass__ = ABCMeta
+
+    def __init__(self):
+        self.results = []
+
+    @abstractmethod
+    def verify(self, result, faulty_set):
+        raise NotImplementedError()
+
+    def set_result(self, solver, problem, statistics):
+        self.results.append((solver, problem, statistics))
 
 
 class TestStatistics(object):
+    """
+    Maintains various statistics related with the single run of group testing algorithm
+    """
     def __init__(self):
         self.number_of_runs = 0
         self.positive_queries = 0
         self.negative_queries = 0
 
     def end_run(self):
+        """
+        called when a batch of paths is inserted to testing system :class:``
+        """
         self.number_of_runs = self.number_of_runs + 1
 
     def get_all_queries(self):
+        """
+        check number of all queries (paths)
+        """
         return self.positive_queries + self.negative_queries
 
     def inc_positive_query(self):
+        """
+        called when a query returns positive result
+        """
         self.positive_queries += 1
 
     def inc_negative_query(self):
+        """
+        called when a query returns negative result
+        """
         self.negative_queries += 1
 
     def get_negative_queries(self):
@@ -66,3 +76,43 @@ class TestStatistics(object):
         self.state = state
 
 
+class Solver(object):
+    """
+    Interface of classes implementing combinatorial group testing algorithm.
+
+    Problem description and tester object have to be inserted in constructor
+    """
+    def __init__(self, problem_description, tester, *args, **kwargs):
+        """
+        :param problem_description: graph constrained combinatorial problem description
+        :type problem_description: base_types.Problem
+        :param tester: tester object which will test all paths
+        :type tester: base_types.PathTester
+        """
+        self.problem_description = problem_description
+        self.graph = self.problem_description.problem_graph.graph
+        self.source = self.problem_description.problem_graph.source
+        self.sink = self.problem_description.problem_graph.sink
+        self.tester = tester
+
+    def solve(self):
+        """
+        runs algorithm solving graph constrained group testing problem
+
+        :returns: set of nodes identified by algorithm as positive
+        :rtype: set
+        """
+        raise NotImplementedError()
+
+
+class PathTester(object):
+    def test_paths(self, paths):
+        """
+        check results for batch tests of paths
+
+        :param paths: paths that will be tested
+        :type paths: list[set]
+        :returns: list of boolean representing results for each of the `paths`.
+        :rtype: list[bool]
+        """
+        raise NotImplementedError()

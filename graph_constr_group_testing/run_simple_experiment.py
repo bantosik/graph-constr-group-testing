@@ -11,11 +11,22 @@ def sameSize(problemIterable):
 
 
 def run_experiment(solverFactories, problemIterable, experimentStats):
+    """
+    Function running each of solvers created by solverFactories for every problem from problemIterable
+    storing corresponding statistics into experimentStats
+
+    :param solverFactories: list of functions creating different solvers (or different configured solvers)
+    :type solverFactories: (base_types.Problem, base_types.PathTester, base_types.TestStatistics) -> base_types.Solver
+    :param problemIterable: iterable of problems for which each of the solver has to examined
+    :type problemIterable: list[base_types.Problem]
+    :param experimentStats: object storing results for each pair solver, problem
+    :type :
+    """
     for solverFactory in solverFactories:
         for problem in problemIterable:
             statistics = base_types.TestStatistics()
             tester = base_types.NonOverlappingPathTester(problem.faulty_set, statistics)
-            solver = solverFactory(problem, tester, statistics)
+            solver = solverFactory(problem, tester)
             result = solver.solve()
             statistics.set_state(experimentStats.verify(result, problem.faulty_set))
             experimentStats.set_result(solver, problem, statistics)
