@@ -50,15 +50,15 @@ class Test(unittest.TestCase):
     def test_path_tester(self):
         g = problem_io.read_problem_from_file_of_name("test_data/test1.json")
         stats = base_types.TestStatistics()
-        path_tester = base_types.PathTester(g.faulty_set, stats)
+        path_tester = base_types.NonOverlappingPathTester(g.faulty_set, stats)
         p1 = ["2","4","6"]
         p2 = ["1","4","6"]
         p3 = ["2","3","6"]
-        result = path_tester.test_path(p1)
+        [result] = path_tester.test_paths([p1])
         self.assertFalse(result, "For %s path test1 should give negative result" % (p1,))
-        result = path_tester.test_path(p2)
+        [result] = path_tester.test_paths([p2])
         self.assertTrue(result, "For %s path test1 should give positive result" % (p2,))
-        result = path_tester.test_path(p3)
+        [result] = path_tester.test_paths([p3])
         self.assertTrue(result, "For %s path test1 should give positive result" % (p3,))
         self.assertEquals(stats.get_positive_queries(), 2, "Should be two positive queries got %d" % (stats.get_positive_queries(),))
         self.assertEquals(stats.get_negative_queries(), 1, "Should be one negative queries got %d" % (stats.get_negative_queries(),))
@@ -68,7 +68,7 @@ class Test(unittest.TestCase):
     def test_brute_force_solver(self):
         g = problem_io.read_problem_from_file_of_name("test_data/test1.json")
         statistics = base_types.TestStatistics()
-        tester = base_types.PathTester(g.faulty_set, statistics)
+        tester = base_types.NonOverlappingPathTester(g.faulty_set, statistics)
         solver = brute_force_solver.BruteForceSolver(g, tester, statistics)
         solution = solver.solve()
         stats = solution[1]

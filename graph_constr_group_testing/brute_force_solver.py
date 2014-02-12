@@ -19,8 +19,7 @@ class BruteForceSolver(object):
 
     def solve(self):
         for path in generate_paths(self.graph, self.source, self.sink):
-            result = self.tester.test_path(path)
-            self.statistics.end_run()
+            [result] = self.tester.test_paths([path])
             self.analysis_state.put_result(result, path)
         return self.analysis_state.get_positive_elements(), self.statistics
 

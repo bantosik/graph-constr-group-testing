@@ -14,7 +14,7 @@ def run_experiment(solverFactories, problemIterable, experimentStats):
     for solverFactory in solverFactories:
         for problem in problemIterable:
             statistics = base_types.TestStatistics()
-            tester = base_types.PathTester(problem.faulty_set, statistics)
+            tester = base_types.NonOverlappingPathTester(problem.faulty_set, statistics)
             solver = solverFactory(problem, tester, statistics)
             result = solver.solve()
             statistics.set_state(experimentStats.verify(result, problem.faulty_set))

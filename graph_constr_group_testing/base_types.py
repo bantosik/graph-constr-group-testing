@@ -9,18 +9,30 @@ ProblemGraph = collections.namedtuple("ProblemGraph", ["graph", "source", "sink"
 def size_of_problem(problem):
     return problem.problem_graph.graph.number_of_nodes() - 2
 
-class PathTester(object):
+class NonOverlappingPathTester(object):
     def __init__(self, faulty_set, stats):
+        """
+        :param faulty_set: set of faulty elements. Existence of it will be tested in test_paths
+        :type faulty_set: set
+        :param stats: object to which various aspects of computation will be reported
+        :type stats: TestStatistics
+        """
         self.faulty_set = faulty_set
         self.stats = stats
 
-    def test_path(self, path):
-        result = any((x in self.faulty_set) for x in path)
-        if result:
-            self.stats.inc_positive_query()
-        else:
-            self.stats.inc_negative_query()
-        return result
+    def test_paths(self, paths):
+        results = []
+        for path in paths:
+            result = any((x in self.faulty_set) for x in path)
+            results.append(result)
+            if result:
+                self.stats.inc_positive_query()
+            else:
+                self.stats.inc_negative_query()
+        self.stats.end_run()
+        return results
+
+
 
 
 class TestStatistics(object):
