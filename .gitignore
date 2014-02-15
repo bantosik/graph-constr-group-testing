@@ -21,6 +21,7 @@ lib64
 
 # Installer logs
 pip-log.txt
+files.txt
 
 # Unit test / coverage reports
 .coverage
@@ -30,7 +31,13 @@ nosetests.xml
 # Translations
 *.mo
 
-# Mr Developer
+# project files
 .mr.developer.cfg
 .project
 .pydevproject
+graph-constr-group-testing.iml
+.idea/
+
+# generated data
+test_data/
+

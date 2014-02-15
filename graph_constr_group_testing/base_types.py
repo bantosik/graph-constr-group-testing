@@ -1,7 +1,20 @@
+"""
+Contains base data structures for defining graph constrained group testing problem,
+and interfaces to operate on them.
+
+Basic structure to exchange graph constrained group testing problem definition is :class:`Problem`.
+It consists of enumeration of faulty elements, graph of links between elements and natural language
+description of the problem.
+
+Interface of every algorithm solving group constrained group testing problem is defined by
+:class:`Solver`, Abstract class :class:`ExperimentStatistics` defines generic interface that can
+be used by experiment runners to verify result returned by solver. Result later is stored together
+with statistics (:class:`TestStatistics`) in memory, where it can be retrieved for each problem/solver pair.
+
+Experiment runner is a function accepting :class:`Experiment` parameter that fills it during call.
+"""
+
 import collections
-
-__author__ = 'bartek'
-
 
 Problem = collections.namedtuple("Problem", ["problem_graph", "faulty_set", "description"])
 ProblemGraph = collections.namedtuple("ProblemGraph", ["graph", "source", "sink"])

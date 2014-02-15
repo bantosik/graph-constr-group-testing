@@ -14,6 +14,6 @@ Contents:
    :maxdepth: 2
 
    intro
-
+   codedoc
 
 
