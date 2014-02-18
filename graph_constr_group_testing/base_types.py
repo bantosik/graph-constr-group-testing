@@ -4,7 +4,9 @@ and interfaces to operate on them.
 
 Basic structure to exchange graph constrained group testing problem definition is :class:`Problem`.
 It consists of enumeration of faulty elements, graph of links between elements and natural language
-description of the problem.
+description of the problem. Graph is described by :class:`ProblemGraph` which consists of
+:class:`networkx.DiGraph`, and distinguished nodes stored in :attr:`ProblemGraph.source`,
+and :attr:`ProblemGraph.sink`
 
 Interface of every algorithm solving group constrained group testing problem is defined by
 :class:`Solver`, Abstract class :class:`ExperimentStatistics` defines generic interface that can

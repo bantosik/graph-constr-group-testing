@@ -10,6 +10,7 @@ BUILDDIR      = build
 MAIN_MODULE   = ../graph_constr_group_testing
 GENERATE_DIR  = source_api
 GENERATE_OPTS = -o $(GENERATE_DIR) -T
+SOURCES       = $(wildcard $(MAIN_MODULE)/**/*.py)
 
 # User-friendly check for sphinx-build
 ifeq ($(shell which $(SPHINXBUILD) >/dev/null 2>&1; echo $$?), 1)
@@ -53,7 +54,7 @@ help:
 clean:
 	rm -rf $(BUILDDIR)/* $(GENERATE_DIR)
 
-apidoc:
+apidoc: $(SOURCES)
 	$(SPHINX_GENERATE) $(GENERATE_OPTS) $(MAIN_MODULE)
 
 html: apidoc
