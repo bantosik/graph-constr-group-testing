@@ -7,9 +7,11 @@ class NumpyMatrix(object):
         self._row_size = numpy.size(self._m, 0)
 
     @classmethod
-    def make_matrix(cls, iterable_of_set, elements_num, iterable_length):
-        matrix = numpy.zeros(shape=(iterable_length, elements_num))
-        for index, sett in enumerate(iterable_of_set):
+    def make_matrix(cls, list_of_set):
+        maxx = max(max(sett) for sett in list_of_set)
+        iterable_length = len(list_of_set)
+        matrix = numpy.zeros(shape=(iterable_length, maxx + 1))
+        for index, sett in enumerate(list_of_set):
             for el in sett:
                 matrix[index, el] = 1
         return cls(matrix)
@@ -27,6 +29,9 @@ class NumpyMatrix(object):
     def  get_columns(self):
         col_count = numpy.size(self._m, 1)
         return [self.get_column(i) for i in range(col_count)]
+
+    def transpose(self):
+        return NumpyMatrix(numpy.transpose(self._m))
 
 class NumpyColumn(object):
     def __init__(self, array):
