@@ -4,10 +4,10 @@ import collections
 from graph_constr_group_testing import base_types
 
 
-class BruteForceSolver(base_types.Solver):
+class BruteForceGCGTSolver(base_types.GCGTSolver):
     def __init__(self, problem_description, tester):
-        super(BruteForceSolver, self).__init__(problem_description, tester)
-        self.analysis_state = BruteForceSolver.SimpleStateAnalyser(self.graph.nodes_iter())
+        super(BruteForceGCGTSolver, self).__init__(problem_description, tester)
+        self.analysis_state = BruteForceGCGTSolver.SimpleStateAnalyser(self.graph.nodes_iter())
 
     def solve(self):
         for path in generate_paths(self.graph, self.source, self.sink):

@@ -91,7 +91,7 @@ class TestStatistics(object):
         self.state = state
 
 
-class Solver(object):
+class GCGTSolver(object):
     """
     Interface of classes implementing combinatorial group testing algorithm.
 

@@ -20,7 +20,7 @@ def averageQueriesForSize(results):
     return zip(*sorted(result, key=lambda x: x[0]))
 
 
-bruteForceFactory = brute_force_solver.BruteForceSolver
+bruteForceFactory = brute_force_solver.BruteForceGCGTSolver
 experimentStats = SimpleExperimentStats()
 
 run_simple_experiment.run_experiment_for_json_directory([bruteForceFactory], experimentStats, directoryPath='test_data/experiment1')

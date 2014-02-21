@@ -69,7 +69,7 @@ class Test(unittest.TestCase):
         g = problem_io.read_problem_from_file_of_name("test_data/test1.json")
         statistics = base_types.TestStatistics()
         tester = non_overlapping_path_tester.NonOverlappingPathTester(g.faulty_set, statistics)
-        solver = brute_force_solver.BruteForceSolver(g, tester)
+        solver = brute_force_solver.BruteForceGCGTSolver(g, tester)
         faulty_set = solver.solve()
         self.assertEquals(faulty_set, g.faulty_set, "Should find all nodes from faulty set %s, got only %s" %
                           (g.faulty_set, faulty_set))
