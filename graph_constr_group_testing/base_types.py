@@ -120,7 +120,7 @@ class GCGTSolver(object):
         raise NotImplementedError()
 
 
-class PathTester(object):
+class SetTester(object):
     def test_paths(self, paths):
         """
         check results for batch tests of paths

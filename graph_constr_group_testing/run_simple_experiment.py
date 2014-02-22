@@ -16,7 +16,7 @@ def run_experiment(solverFactories, problemIterable, experimentStats):
     storing corresponding statistics into experimentStats
 
     :param solverFactories: list of functions creating different solvers (or different configured solvers)
-    :type solverFactories: (base_types.Problem, base_types.PathTester, base_types.TestStatistics) -> base_types.GCGTSolver
+    :type solverFactories: (base_types.Problem, base_types.SetTester, base_types.TestStatistics) -> base_types.GCGTSolver
     :param problemIterable: iterable of problems for which each of the solver has to examined
     :type problemIterable: list[base_types.Problem]
     :param experimentStats: object storing results for each pair solver, problem

@@ -1,6 +1,6 @@
 from graph_constr_group_testing import base_types
 
-class NonOverlappingPathTester(base_types.PathTester):
+class NonOverlappingSetTester(base_types.SetTester):
     """
     Simulator of testing system.
 
