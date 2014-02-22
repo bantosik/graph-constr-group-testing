@@ -77,6 +77,23 @@ class Test(unittest.TestCase):
         self.assertEquals(statistics.get_positive_queries(), 7, "Should have 7 positive queries in total got %d" % (statistics.get_positive_queries(),))
         self.assertEquals(statistics.get_negative_queries(), 1, "Should have 1 positive queries in total got %d" % (statistics.get_negative_queries(),))
 
+    def test_brute_force_solver2(self):
+        g = nx.DiGraph()
+        g.add_edge(1,2)
+        g.add_edge(2,4)
+        g.add_edge(1,3)
+        g.add_edge(3,4)
+        g.add_edge(3,5)
+        g.add_edge(5,4)
+
+        graph = base_types.ProblemGraph(g, 1, 4)
+        problem = base_types.Problem(graph, {5}, None)
+        statistics = base_types.TestStatistics()
+        tester = non_overlapping_set_tester.NonOverlappingSetTester(problem.faulty_set, statistics)
+        solver = brute_force_solver.BruteForceGCGTSolver(problem, tester)
+        faulty_set = solver.solve()
+        self.assertEqual(faulty_set, {5})
+
     def test_is_dag_connected(self):
         g = nx.DiGraph()
         g.add_edge(1,2)
@@ -105,6 +122,15 @@ class Test(unittest.TestCase):
         g.add_edge(2,4)
         g.add_edge(3,4)
         self.assertEqual(test_graph_generator.get_start_stop_vertex(g), (1,4))
+
+    def test_generate_paths_generates_whole_path(self):
+        g = nx.DiGraph()
+        g.add_edge(1,2)
+        g.add_edge(2,3)
+        g.add_edge(3,4)
+        all_paths = list(brute_force_solver.generate_paths(g, 1,4))
+        self.assertEqual(len(all_paths), 1)
+        self.assertEqual([1,2,3,4], list(brute_force_solver.generate_paths(g, 1,4))[0])
 
 if __name__ == "__main__":
     pass

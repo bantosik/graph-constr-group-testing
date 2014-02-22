@@ -18,19 +18,23 @@ class BruteForceGCGTSolver(base_types.GCGTSolver):
     class SimpleStateAnalyser(object):
         def __init__(self, nodes_iterator):
             self.nodes = collections.defaultdict(int)
+            #all elements are guilty until proven innocent
             for i in nodes_iterator:
-                self.nodes[i] = False
+                self.nodes[i] = True
 
         def put_result(self, result, elements):
-            for e in elements:
-                self.nodes[e] = result
+            #element in path that gives negative result, will prove its innocence
+            if not result:
+                for e in elements:
+                    self.nodes[e] = result
 
         def get_positive_elements(self):
+            #remaining faulty element
             return set([e for e, state in self.nodes.iteritems() if state])
                 
 def generate_paths(graph, start_point, end_point):
     if start_point == end_point:
-        yield []
+        yield [end_point]
     else:
         for begin, end in graph.out_edges(start_point):
             for p in generate_paths(graph, end, end_point):
