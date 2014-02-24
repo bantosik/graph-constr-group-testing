@@ -1,12 +1,10 @@
-import numpy
+from unittest import TestCase
+from graph_constr_group_testing.block_design import generate_disjunct_from_hamming, check_is_d_disjunct
 
 __author__ = 'bartek'
 
-from generate_d_disjunct import generate_hamming_matrix
 
-
-def test_hamming_matrix():
-    assert (generate_hamming_matrix(7) == numpy.array([[ 1.,  1.,  0.,  1.,  0.,  0., 0.],
-                                                      [ 1.,  0.,  1.,  0.,  1.,  0., 0.],
-                                                      [ 0.,  1.,  1.,  0.,  0.,  1., 0.],
-                                                      [ 1.,  1.,  1.,  0.,  0.,  0., 1.]])).all()
+class TestGenerate_d_disjunct(TestCase):
+    def test_generate_d_disjunct(self):
+        m = generate_disjunct_from_hamming.generate_d_disjunct(14)
+        self.assertTrue(m, check_is_d_disjunct.is_d_disjunct(m, 4))

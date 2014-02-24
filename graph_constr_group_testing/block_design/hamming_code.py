@@ -1,4 +1,5 @@
 import numpy
+from graph_constr_group_testing.block_design import linear_codes
 
 __author__ = 'bartek'
 
@@ -35,14 +36,7 @@ def fill_column(hmatrix, k, i):
         value = value >> 1
         bit += 1
 
-
-def make_g_matrix(hmatrix, content_bits_number):
-    submatrix_to_transpose = hmatrix[:,0:content_bits_number]
-    l = numpy.transpose(submatrix_to_transpose)
-    return numpy.concatenate([l, numpy.eye(content_bits_number)], axis=1)
-
-
-def generate_hamming_matrix(num_of_encoding_bits):
+def generation_matrix(num_of_encoding_bits):
     #assert num of bits in the form 2^n - 1
     assert ~ ((num_of_encoding_bits) & (num_of_encoding_bits + 1))
     parity_bits_number = count_positions(num_of_encoding_bits)
@@ -58,4 +52,7 @@ def generate_hamming_matrix(num_of_encoding_bits):
             k = last_column
             last_column -= 1
         fill_column(hmatrix, k, i)
-    return make_g_matrix(hmatrix, content_bits_number)
+    return linear_codes.make_g_matrix(hmatrix, content_bits_number)
+
+def get_code(num_of_encoding_bits):
+    return linear_codes.Code(generation_matrix(num_of_encoding_bits), 3)
