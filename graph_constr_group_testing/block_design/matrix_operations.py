@@ -7,14 +7,25 @@ class NumpyMatrix(object):
         self._row_size = numpy.size(self._m, 0)
 
     @classmethod
-    def make_matrix(cls, list_of_set):
+    def _make_matrix(cls, list_of_set):
         maxx = max(max(sett) for sett in list_of_set)
         iterable_length = len(list_of_set)
         matrix = numpy.zeros(shape=(iterable_length, maxx + 1))
         for index, sett in enumerate(list_of_set):
             for el in sett:
                 matrix[index, el] = 1
+        return matrix
+
+    @classmethod
+    def make_matrix_from_blocks(cls, list_of_set):
+        matrix = cls._make_matrix(list_of_set)
         return cls(matrix)
+
+    @classmethod
+    def make_matrix_from_columns(cls, list_of_columns):
+        matrix = cls._make_matrix(list_of_columns)
+        return cls(numpy.transpose(matrix))
+
 
     def sum_columns(self, combination):
         return sum(combination, NumpyColumn.make_column_from_iter([0 for i in xrange(self._row_size)]))
