@@ -60,9 +60,9 @@ class Test(unittest.TestCase):
         self.assertTrue(result, "For %s path test1 should give positive result" % (p2,))
         [result] = path_tester.test_paths([p3])
         self.assertTrue(result, "For %s path test1 should give positive result" % (p3,))
-        self.assertEquals(stats.get_positive_queries(), 2, "Should be two positive queries got %d" % (stats.get_positive_queries(),))
-        self.assertEquals(stats.get_negative_queries(), 1, "Should be one negative queries got %d" % (stats.get_negative_queries(),))
-        self.assertEquals(stats.get_all_queries(), 3, "Should be 3 queries in total got %d" % (stats.get_all_queries(),))
+        self.assertEquals(stats.get_var('positive'), 2, "Should be two positive queries got %d" % (stats.get_var('positive'),))
+        self.assertEquals(stats.get_var('negative'), 1, "Should be one negative queries got %d" % (stats.get_var('negative'),))
+        self.assertEquals(stats.get_var('all'), 3, "Should be 3 queries in total got %d" % (stats.get_var('all'),))
 
 
     def test_brute_force_solver(self):
@@ -73,9 +73,9 @@ class Test(unittest.TestCase):
         faulty_set = solver.solve()
         self.assertEquals(faulty_set, g.faulty_set, "Should find all nodes from faulty set %s, got only %s" %
                           (g.faulty_set, faulty_set))
-        self.assertEquals(statistics.get_all_queries(), 8, "Should have 8 queries in total got %d" % (statistics.get_all_queries(),))
-        self.assertEquals(statistics.get_positive_queries(), 7, "Should have 7 positive queries in total got %d" % (statistics.get_positive_queries(),))
-        self.assertEquals(statistics.get_negative_queries(), 1, "Should have 1 positive queries in total got %d" % (statistics.get_negative_queries(),))
+        self.assertEquals(statistics.get_var('all'), 8, "Should have 8 queries in total got %d" % (statistics.get_var('all'),))
+        self.assertEquals(statistics.get_var('positive'), 7, "Should have 7 positive queries in total got %d" % (statistics.get_var('positive'),))
+        self.assertEquals(statistics.get_var('negative'), 1, "Should have 1 negative queries in total got %d" % (statistics.get_var('negative'),))
 
     def test_brute_force_solver2(self):
         g = nx.DiGraph()
