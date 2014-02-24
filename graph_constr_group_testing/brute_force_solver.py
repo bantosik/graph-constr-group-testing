@@ -1,7 +1,7 @@
 """Module contains basic solver and statistic gathering utility classes"""
 
 import collections
-from graph_constr_group_testing import base_types
+from graph_constr_group_testing.core import base_types
 
 
 class BruteForceGCGTSolver(base_types.GCGTSolver):

@@ -1,6 +1,6 @@
 import random
 import networkx as nx
-from graph_constr_group_testing import base_types
+from graph_constr_group_testing.core import base_types
 
 class TestGraphException(Exception):
     pass
@@ -58,4 +58,4 @@ def generate_random_problem_description(n, d):
     #first generate random dag
     problemGraph = generate_connected_dag(n + 2)
     f_nodes = faulty_nodes(problemGraph, d)
-    return base_types.Problem(problem_graph=problemGraph, faulty_set=f_nodes, description=None)
+    return base_types.GCGTProblem(problem_graph=problemGraph, faulty_set=f_nodes, description=None)

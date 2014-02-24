@@ -1,4 +1,4 @@
-from graph_constr_group_testing import base_types
+from graph_constr_group_testing.core import base_types
 
 class NonOverlappingSetTester(base_types.SetTester):
     """

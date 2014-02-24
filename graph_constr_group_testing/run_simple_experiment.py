@@ -1,6 +1,7 @@
 import collections
 import os
-from graph_constr_group_testing import base_types, problem_json_io, problem_io
+from graph_constr_group_testing.core import base_types, non_overlapping_set_tester
+from graph_constr_group_testing.io import problem_io, problem_json_io
 
 
 def sameSize(problemIterable):
@@ -25,10 +26,10 @@ def run_experiment(solverFactories, problemIterable, experimentStats):
     for solverFactory in solverFactories:
         for problem in problemIterable:
             statistics = base_types.TestStatistics()
-            tester = base_types.NonOverlappingPathTester(problem.faulty_set, statistics)
+            tester = non_overlapping_set_tester.NonOverlappingSetTester(problem.faulty_set, statistics)
             solver = solverFactory(problem, tester)
             result = solver.solve()
-            statistics.set_state(experimentStats.verify(result, problem.faulty_set))
+            statistics.set_var('result', experimentStats.verify(result, problem.faulty_set))
             experimentStats.set_result(solver, problem, statistics)
 
 
