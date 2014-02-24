@@ -1,6 +1,7 @@
 import json
 import networkx as nx
-from graph_constr_group_testing import base_types, problem_io
+from graph_constr_group_testing.core import base_types
+from graph_constr_group_testing.io import problem_io
 
 SOURCE_NODE_TAG = 'source_node'
 SINK_NODE_TAG = 'sink_node'
@@ -23,7 +24,7 @@ def read_problem_from_file(f):
     faulty_set = set(data[NODES_TAG])
     problem_graph = _create_problem_graph(data[GRAPH_TAG])
     description = "".join(data.get(DESCRIPTION_TAG, ''))
-    problem = base_types.Problem(problem_graph, faulty_set, description)
+    problem = base_types.GCGTProblem(problem_graph, faulty_set, description)
     return problem
 
 

@@ -18,7 +18,8 @@ Experiment runner is a function accepting :class:`Experiment` parameter that fil
 
 import collections
 
-Problem = collections.namedtuple("Problem", ["problem_graph", "faulty_set", "description"])
+Problem = collections.namedtuple("Problem", ["faulty_set", "description"])
+GCGTProblem = collections.namedtuple("GCGTProblem", ["problem_graph", "faulty_set", "description"])
 ProblemGraph = collections.namedtuple("ProblemGraph", ["graph", "source", "sink"])
 
 def size_of_problem(problem):
@@ -26,6 +27,11 @@ def size_of_problem(problem):
 
 
 from abc import abstractmethod, ABCMeta
+
+class Verificator(object):
+    @abstractmethod
+    def verify(self, result, faulty_set):
+        raise NotImplementedError()
 
 
 class ExperimentStatistics(object):
@@ -36,10 +42,6 @@ class ExperimentStatistics(object):
 
     def __init__(self):
         self.results = []
-
-    @abstractmethod
-    def verify(self, result, faulty_set):
-        raise NotImplementedError()
 
     def set_result(self, solver, problem, statistics):
         self.results.append((solver, problem, statistics))

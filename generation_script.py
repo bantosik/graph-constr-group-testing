@@ -1,5 +1,6 @@
 import sys
-from graph_constr_group_testing import test_graph_generator, problem_json_io
+from graph_constr_group_testing import problem_json_io
+from graph_constr_group_testing.generating import test_graph_generator
 
 sizes_of_problem = xrange(4, 20)
 problem_count = 30

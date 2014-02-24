@@ -1,8 +1,8 @@
 import collections
-from graph_constr_group_testing import run_simple_experiment, brute_force_solver, base_types
+from graph_constr_group_testing.core import base_types
 
 
-class SimpleExperimentStats(base_types.ExperimentStatistics):
+class SimpleExperimentStats(base_types.Verificator, base_types.ExperimentStatistics):
     def verify(self, result, faulty_set):
         return result == faulty_set
 
@@ -20,7 +20,3 @@ def averageQueriesForSize(results):
     return zip(*sorted(result, key=lambda x: x[0]))
 
 
-bruteForceFactory = brute_force_solver.BruteForceGCGTSolver
-experimentStats = SimpleExperimentStats()
-
-run_simple_experiment.run_experiment_for_json_directory([bruteForceFactory], experimentStats, directoryPath='test_data/experiment1')

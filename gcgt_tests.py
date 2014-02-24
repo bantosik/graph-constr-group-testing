@@ -1,9 +1,14 @@
 import StringIO
 import unittest
+from nose.plugins.attrib import attr
 
 import networkx as nx
 
-from graph_constr_group_testing import problem_json_io as problem_io, base_types, brute_force_solver, test_graph_generator, non_overlapping_set_tester
+from graph_constr_group_testing.io import problem_json_io as problem_io
+from graph_constr_group_testing.core import base_types, non_overlapping_set_tester
+from graph_constr_group_testing import brute_force_solver
+from graph_constr_group_testing import brute_force_experiments, run_simple_experiment
+from graph_constr_group_testing.generating import test_graph_generator
 
 
 def graph_equal(g1, g2):
@@ -42,7 +47,7 @@ class Test(unittest.TestCase):
         start, stop = 1, 4
         graph = base_types.ProblemGraph(g, start, stop)
         faulty_nodes = {2,}
-        problem = base_types.Problem(graph, faulty_nodes, "Description of a problem")
+        problem = base_types.GCGTProblem(graph, faulty_nodes, "Description of a problem")
         f = StringIO.StringIO()
         problem_io.write_problem_to_file(problem, f)
         self.assertEqual(f.getvalue(), """{"graph": {"sink_node": "4", "edges": {"1": ["2", "3"], "3": ["4"], "2": ["4"], "4": []}, "source_node": "1"}, "version": "0.1", "type": "group testing problem", "description": ["Description of a problem"], "faulty_nodes": ["2"]}""")
@@ -87,7 +92,7 @@ class Test(unittest.TestCase):
         g.add_edge(5,4)
 
         graph = base_types.ProblemGraph(g, 1, 4)
-        problem = base_types.Problem(graph, {5}, None)
+        problem = base_types.GCGTProblem(graph, {5}, None)
         statistics = base_types.TestStatistics()
         tester = non_overlapping_set_tester.NonOverlappingSetTester(problem.faulty_set, statistics)
         solver = brute_force_solver.BruteForceGCGTSolver(problem, tester)
@@ -131,6 +136,13 @@ class Test(unittest.TestCase):
         all_paths = list(brute_force_solver.generate_paths(g, 1,4))
         self.assertEqual(len(all_paths), 1)
         self.assertEqual([1,2,3,4], list(brute_force_solver.generate_paths(g, 1,4))[0])
+
+    @attr('slow')
+    def test_run_experiments(self):
+        bruteForceFactory = brute_force_solver.BruteForceGCGTSolver
+        experimentStats = brute_force_experiments.SimpleExperimentStats()
+        run_simple_experiment.run_experiment_for_json_directory([bruteForceFactory], experimentStats, directoryPath='test_data/experiment1')
+
 
 if __name__ == "__main__":
     pass
