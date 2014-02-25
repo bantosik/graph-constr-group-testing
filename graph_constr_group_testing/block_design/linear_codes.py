@@ -7,9 +7,18 @@ def make_g_matrix(hmatrix, content_bits_number):
     return numpy.concatenate([l, numpy.eye(content_bits_number)], axis=1)
 
 
-def make_binary_vector(i):
-    return numpy.array([int(a) for a in bin(i)[2:]])
+def make_binary_vector(i, data_length):
+    result = [int(a) for a in bin(i)[2:]]
+    n = len(result)
+    for i in xrange(data_length - n):
+        result.insert(0,0)
+    return numpy.array(result)
 
+def gen_multiply(data, generation_matrix):
+    s = numpy.size(generation_matrix, 1)
+    k = numpy.size(generation_matrix, 0)
+    result = numpy.dot(data, generation_matrix) % 2
+    return result
 
 class Code(object):
     def __init__(self, generation_matrix, min_distance):
@@ -20,7 +29,7 @@ class Code(object):
 
     def generate_code_words(self):
         for i in xrange(2**self._data_length):
-            yield make_binary_vector(i)
+            yield gen_multiply(make_binary_vector(i, self._data_length), self._generation_matrix)
 
     def __eq__(self, other):
         return (self._generation_matrix == other._generation_matrix).all() and self._min_distance == other._min_distance
@@ -28,7 +37,7 @@ class Code(object):
 
 def make_set(code_word):
     result = set([])
-    for i, elem in enumerate(code_word):
+    for i, elem in enumerate(numpy.nditer(code_word)):
         if elem:
             result.add(i)
     return result

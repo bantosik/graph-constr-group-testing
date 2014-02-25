@@ -10,22 +10,40 @@ EDGES_TAG = 'edges'
 DESCRIPTION_TAG = 'description'
 GRAPH_TAG = 'graph'
 NODES_TAG = 'faulty_nodes'
+ALL_NODES_TAG = 'elements'
 TYPE_TAG = "type"
 VERSION_TAG = "version"
+GRAPH_CONSTR_GROUP_TESTING_PROBLEM_TAG = "graph constr group testing problem"
 GROUP_TESTING_PROBLEM_TAG = "group testing problem"
 CURRENT_VERSION = "0.1"
 
 
-def read_problem_from_file(f):
-    data = json.load(f)
-    typ = data[TYPE_TAG]
-    if typ != GROUP_TESTING_PROBLEM_TAG:
-        raise problem_io.NotGroupTestingDescriptionFile()
+def read_graph_group_testing(data):
     faulty_set = set(data[NODES_TAG])
     problem_graph = _create_problem_graph(data[GRAPH_TAG])
     description = "".join(data.get(DESCRIPTION_TAG, ''))
     problem = base_types.GCGTProblem(problem_graph, faulty_set, description)
     return problem
+
+def read_group_testing(data):
+    faulty_set = set(data[NODES_TAG])
+    all_nodes = set(data[ALL_NODES_TAG])
+    description = "".join(data.get(DESCRIPTION_TAG, ''))
+    return base_types.Problem(all_nodes, faulty_set, description)
+
+
+get_read_function = {GRAPH_CONSTR_GROUP_TESTING_PROBLEM_TAG: read_graph_group_testing,
+                     GROUP_TESTING_PROBLEM_TAG: read_group_testing}
+
+
+def read_problem_from_file(f):
+    data = json.load(f)
+    typ = data[TYPE_TAG]
+    try:
+        return get_read_function[typ](data)
+    except KeyError:
+        raise problem_io.NotGroupTestingDescriptionFile()
+
 
 
 def read_problem_from_file_of_name(filename):
@@ -43,7 +61,7 @@ def _serialize_graph_to_dict(problem_graph):
 
 
 def write_problem_to_file(problem, file):
-    typ = GROUP_TESTING_PROBLEM_TAG
+    typ = GRAPH_CONSTR_GROUP_TESTING_PROBLEM_TAG
     version = CURRENT_VERSION
     faulty_set = list(str(node) for node in problem.faulty_set)
     graph = _serialize_graph_to_dict(problem.problem_graph)
