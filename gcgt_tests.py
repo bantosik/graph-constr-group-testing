@@ -6,7 +6,7 @@ import networkx as nx
 
 from graph_constr_group_testing.io import problem_json_io as problem_io
 from graph_constr_group_testing.core import base_types, non_overlapping_set_tester
-from graph_constr_group_testing import brute_force_solver
+from graph_constr_group_testing import brute_force_solver, hamming_solver
 from graph_constr_group_testing import brute_force_experiments, run_simple_experiment
 from graph_constr_group_testing.generating import test_graph_generator
 
@@ -50,7 +50,7 @@ class Test(unittest.TestCase):
         problem = base_types.GCGTProblem(graph, faulty_nodes, "Description of a problem")
         f = StringIO.StringIO()
         problem_io.write_problem_to_file(problem, f)
-        self.assertEqual(f.getvalue(), """{"graph": {"sink_node": "4", "edges": {"1": ["2", "3"], "3": ["4"], "2": ["4"], "4": []}, "source_node": "1"}, "version": "0.1", "type": "group testing problem", "description": ["Description of a problem"], "faulty_nodes": ["2"]}""")
+        self.assertEqual(f.getvalue(), """{"graph": {"sink_node": "4", "edges": {"1": ["2", "3"], "3": ["4"], "2": ["4"], "4": []}, "source_node": "1"}, "version": "0.1", "type": "graph constr group testing problem", "description": ["Description of a problem"], "faulty_nodes": ["2"]}""")
 
     def test_path_tester(self):
         g = problem_io.read_problem_from_file_of_name("test_data/test1.json")
@@ -136,6 +136,19 @@ class Test(unittest.TestCase):
         all_paths = list(brute_force_solver.generate_paths(g, 1,4))
         self.assertEqual(len(all_paths), 1)
         self.assertEqual([1,2,3,4], list(brute_force_solver.generate_paths(g, 1,4))[0])
+
+    def test_simple_raw_testing_problem_is_solved_by_hamming(self):
+        problem = problem_io.read_problem_from_file_of_name("test_data/test_gen1.json")
+        statistics = base_types.TestStatistics()
+        tester = non_overlapping_set_tester.NonOverlappingSetTester(problem.faulty_set, statistics)
+        solver = hamming_solver.HammingGroupTestingSolver(problem, tester)
+        faulty_set = solver.solve()
+        self.assertEquals(faulty_set, problem.faulty_set, "Should find all nodes from faulty set %s, got only %s" %
+                          (problem.faulty_set, faulty_set))
+        #self.assertEquals(statistics.get_var('all'), 8, "Should have 8 queries in total got %d" % (statistics.get_var('all'),))
+        #self.assertEquals(statistics.get_var('positive'), 7, "Should have 7 positive queries in total got %d" % (statistics.get_var('positive'),))
+        #self.assertEquals(statistics.get_var('negative'), 1, "Should have 1 negative queries in total got %d" % (statistics.get_var('negative'),))
+
 
     @attr('slow')
     def test_run_experiments(self):

@@ -1,5 +1,5 @@
 {
-    "type": "group testing problem",
+    "type": "graph constr group testing problem",
     "version": "0.1",
 	"description" : ["Problem consist of 6 nodes grouped by 2 in 3 layers: 1, 2, 3. ",
 		"Layer 1 is fully connected with layer 2, and layer 2 with layer 3"],

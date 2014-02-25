@@ -18,7 +18,7 @@ Experiment runner is a function accepting :class:`Experiment` parameter that fil
 
 import collections
 
-Problem = collections.namedtuple("Problem", ["faulty_set", "description"])
+Problem = collections.namedtuple("Problem", ["all_nodes", "faulty_set", "description"])
 GCGTProblem = collections.namedtuple("GCGTProblem", ["problem_graph", "faulty_set", "description"])
 ProblemGraph = collections.namedtuple("ProblemGraph", ["graph", "source", "sink"])
 
@@ -64,9 +64,22 @@ class TestStatistics(object):
         self.variable_dict[var] = self.variable_dict.get(var, 0) + 1
 
 
+class Solver(object):
+    def __init__(self, problem_description, tester, *args, **kwargs):
+        raise NotImplementedError()
+
+    def solve(self):
+        """
+        runs algorithm solving graph constrained group testing problem
+
+        :returns: set of nodes identified by algorithm as positive
+        :rtype: set
+        """
+        raise NotImplementedError()
 
 
-class GCGTSolver(object):
+
+class GCGTSolver(Solver):
     """
     Interface of classes implementing combinatorial group testing algorithm.
 
@@ -85,14 +98,6 @@ class GCGTSolver(object):
         self.sink = self.problem_description.problem_graph.sink
         self.tester = tester
 
-    def solve(self):
-        """
-        runs algorithm solving graph constrained group testing problem
-
-        :returns: set of nodes identified by algorithm as positive
-        :rtype: set
-        """
-        raise NotImplementedError()
 
 
 class SetTester(object):

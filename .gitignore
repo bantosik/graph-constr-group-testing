@@ -38,6 +38,4 @@ nosetests.xml
 graph-constr-group-testing.iml
 .idea/
 
-# generated data
-test_data/
 
