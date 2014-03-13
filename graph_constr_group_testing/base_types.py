@@ -50,45 +50,23 @@ class TestStatistics(object):
     Maintains various statistics related with the single run of group testing algorithm
     """
     def __init__(self):
-        self.number_of_runs = 0
-        self.positive_queries = 0
-        self.negative_queries = 0
+        self._data = {}
 
-    def end_run(self):
+    def increment_var(self, varname):
         """
         called when a batch of paths is inserted to testing system :class:``
         """
-        self.number_of_runs = self.number_of_runs + 1
+        self._data[varname] = self._data.get(varname, 0) + 1
+        return self
 
-    def get_all_queries(self):
+    def get_var(self, varname):
         """
         check number of all queries (paths)
         """
-        return self.positive_queries + self.negative_queries
+        return self._data.get(varname, 0)
 
-    def inc_positive_query(self):
-        """
-        called when a query returns positive result
-        """
-        self.positive_queries += 1
-
-    def inc_negative_query(self):
-        """
-        called when a query returns negative result
-        """
-        self.negative_queries += 1
-
-    def get_negative_queries(self):
-        return self.negative_queries
-
-    def get_positive_queries(self):
-        return self.positive_queries
-
-    def get_number_of_runs(self):
-        return self.number_of_runs
-
-    def set_state(self, state):
-        self.state = state
+    def set_var(self, varname, state):
+        self._data[varname] = state
 
 
 class GCGTSolver(object):

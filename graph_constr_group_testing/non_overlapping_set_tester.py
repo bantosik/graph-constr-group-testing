@@ -23,8 +23,9 @@ class NonOverlappingSetTester(base_types.SetTester):
             result = any((x in self.faulty_set) for x in path)
             results.append(result)
             if result:
-                self.stats.inc_positive_query()
+                self.stats.increment_var('positive_queries')
             else:
-                self.stats.inc_negative_query()
-        self.stats.end_run()
+                self.stats.increment_var('negative_queries')
+            self.stats.increment_var('all_queries')
+        self.stats.increment_var('runs')
         return results

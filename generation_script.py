@@ -1,5 +1,5 @@
 import sys
-from graph_constr_group_testing import test_graph_generator, problem_json_io
+from graph_constr_group_testing import random_dag_generator, problem_json_io
 
 sizes_of_problem = xrange(4, 20)
 problem_count = 30
@@ -15,5 +15,5 @@ for size_of_problem in sizes_of_problem:
         sys.stdout.flush()
         counter += 1
         filename = "{dir}problem_{size}_{faults}_{idp}.json".format(dir=dirname, size=size_of_problem, idp=c, faults=faults)
-        problem_description = test_graph_generator.generate_random_problem_description(size_of_problem, faults)
+        problem_description = random_dag_generator.generate_random_problem_description(size_of_problem, faults)
         problem_json_io.write_problem_to_file_of_name(problem_description, filename)
