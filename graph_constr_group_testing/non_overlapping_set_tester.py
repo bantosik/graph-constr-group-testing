@@ -4,8 +4,8 @@ class NonOverlappingSetTester(base_types.SetTester):
     """
     Simulator of testing system.
 
-    Objects of this class will be used for testing paths by solver objects.
-    To test solver will use function :func:`test_paths`.
+    Objects of this class will be used for testing paths by solver objects. State
+    of the testing system is passed in the constructor, :func:`test_paths` function is used by solver.
     """
     def __init__(self, faulty_set, stats):
         """
