@@ -13,7 +13,7 @@ def averageQueriesForSize(results):
     for solver, problem, statistics in results:
         n = base_types.size_of_problem(problem)
         count[n] += 1
-        sumallqueries[n] += statistics.get_var()
+        sumallqueries[n] += statistics.get_all_queries()
 
     for k, v in sumallqueries.iteritems():
         result.append((k, float(v)/count[k]))

@@ -3,7 +3,7 @@ import unittest
 
 import networkx as nx
 
-from graph_constr_group_testing import problem_json_io as problem_io, base_types, brute_force_solver, random_dag_generator, non_overlapping_set_tester
+from graph_constr_group_testing import problem_json_io as problem_io, base_types, brute_force_solver, test_graph_generator, non_overlapping_set_tester
 
 
 def graph_equal(g1, g2):
@@ -60,9 +60,9 @@ class Test(unittest.TestCase):
         self.assertTrue(result, "For %s path test1 should give positive result" % (p2,))
         [result] = path_tester.test_paths([p3])
         self.assertTrue(result, "For %s path test1 should give positive result" % (p3,))
-        self.assertEquals(stats.get_var('positive_queries'), 2, "Should be two positive queries got %d" % (stats.get_var('positive_queries'),))
-        self.assertEquals(stats.get_var('negative_queries'), 1, "Should be one negative queries got %d" % (stats.get_var('negative_queries'),))
-        self.assertEquals(stats.get_var('all_queries'), 3, "Should be 3 queries in total got %d" % (stats.get_var('all_queries'),))
+        self.assertEquals(stats.get_positive_queries(), 2, "Should be two positive queries got %d" % (stats.get_positive_queries(),))
+        self.assertEquals(stats.get_negative_queries(), 1, "Should be one negative queries got %d" % (stats.get_negative_queries(),))
+        self.assertEquals(stats.get_all_queries(), 3, "Should be 3 queries in total got %d" % (stats.get_all_queries(),))
 
 
     def test_brute_force_solver(self):
@@ -73,9 +73,9 @@ class Test(unittest.TestCase):
         faulty_set = solver.solve()
         self.assertEquals(faulty_set, g.faulty_set, "Should find all nodes from faulty set %s, got only %s" %
                           (g.faulty_set, faulty_set))
-        self.assertEquals(statistics.get_var('all_queries'), 8, "Should have 8 queries in total got %d" % (statistics.get_var('all_queries'),))
-        self.assertEquals(statistics.get_var('positive_queries'), 7, "Should have 7 positive queries in total got %d" % (statistics.get_var('positive_queries'),))
-        self.assertEquals(statistics.get_var('negative_queries'), 1, "Should have 1 positive queries in total got %d" % (statistics.get_var('negative_queries'),))
+        self.assertEquals(statistics.get_all_queries(), 8, "Should have 8 queries in total got %d" % (statistics.get_all_queries(),))
+        self.assertEquals(statistics.get_positive_queries(), 7, "Should have 7 positive queries in total got %d" % (statistics.get_positive_queries(),))
+        self.assertEquals(statistics.get_negative_queries(), 1, "Should have 1 positive queries in total got %d" % (statistics.get_negative_queries(),))
 
     def test_brute_force_solver2(self):
         g = nx.DiGraph()
@@ -112,8 +112,8 @@ class Test(unittest.TestCase):
         g = nx.DiGraph()
         g.add_edge(1,2)
         g.add_edge(1,3)
-        with self.assertRaises(random_dag_generator.TestGraphException):
-            random_dag_generator.get_start_stop_vertex(g)
+        with self.assertRaises(test_graph_generator.TestGraphException):
+            test_graph_generator.get_start_stop_vertex(g)
 
     def test_is_consistent_dag_marked_consistent(self):
         g = nx.DiGraph()
@@ -121,7 +121,7 @@ class Test(unittest.TestCase):
         g.add_edge(1,3)
         g.add_edge(2,4)
         g.add_edge(3,4)
-        self.assertEqual(random_dag_generator.get_start_stop_vertex(g), (1,4))
+        self.assertEqual(test_graph_generator.get_start_stop_vertex(g), (1,4))
 
     def test_generate_paths_generates_whole_path(self):
         g = nx.DiGraph()

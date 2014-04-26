@@ -28,7 +28,7 @@ def run_experiment(solverFactories, problemIterable, experimentStats):
             tester = base_types.NonOverlappingPathTester(problem.faulty_set, statistics)
             solver = solverFactory(problem, tester)
             result = solver.solve()
-            statistics.set_var('state', experimentStats.verify(result, problem.faulty_set))
+            statistics.set_state(experimentStats.verify(result, problem.faulty_set))
             experimentStats.set_result(solver, problem, statistics)
 
 
