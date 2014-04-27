@@ -19,7 +19,7 @@ Experiment runner is a function accepting :class:`Experiment` parameter that fil
 import collections
 
 Problem = collections.namedtuple("Problem", ["all_nodes", "faulty_set", "description"])
-GCGTProblem = collections.namedtuple("GCGTProblem", ["problem_graph", "faulty_set", "description"])
+GCGTProblem = collections.namedtuple("GCGTProblem", ["all_nodes", "faulty_set", "description", "problem_graph"])
 ProblemGraph = collections.namedtuple("ProblemGraph", ["graph", "source", "sink"])
 
 def size_of_problem(problem):
@@ -77,7 +77,8 @@ class Solver(object):
         """
         raise NotImplementedError()
 
-
+class SolverError(Exception):
+    pass
 
 class GCGTSolver(Solver):
     """

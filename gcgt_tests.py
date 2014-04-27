@@ -6,7 +6,7 @@ import networkx as nx
 
 from graph_constr_group_testing.io import problem_json_io as problem_io
 from graph_constr_group_testing.core import base_types, non_overlapping_set_tester
-from graph_constr_group_testing import brute_force_solver, hamming_solver
+from graph_constr_group_testing import iterative_solvers, hamming_solver, graph_utils
 from graph_constr_group_testing import brute_force_experiments, run_simple_experiment
 from graph_constr_group_testing.generating import test_graph_generator
 
@@ -47,7 +47,7 @@ class Test(unittest.TestCase):
         start, stop = 1, 4
         graph = base_types.ProblemGraph(g, start, stop)
         faulty_nodes = {2,}
-        problem = base_types.GCGTProblem(graph, faulty_nodes, "Description of a problem")
+        problem = base_types.GCGTProblem({1,2,3,4}, faulty_nodes, "Description of a problem", graph)
         f = StringIO.StringIO()
         problem_io.write_problem_to_file(problem, f)
         self.assertEqual(f.getvalue(), """{"graph": {"sink_node": "4", "edges": {"1": ["2", "3"], "3": ["4"], "2": ["4"], "4": []}, "source_node": "1"}, "version": "0.1", "type": "graph constr group testing problem", "description": ["Description of a problem"], "faulty_nodes": ["2"]}""")
@@ -74,7 +74,7 @@ class Test(unittest.TestCase):
         g = problem_io.read_problem_from_file_of_name("test_data/test1.json")
         statistics = base_types.TestStatistics()
         tester = non_overlapping_set_tester.NonOverlappingSetTester(g.faulty_set, statistics)
-        solver = brute_force_solver.BruteForceGCGTSolver(g, tester)
+        solver = iterative_solvers.BruteForceGCGTSolver(g, tester)
         faulty_set = solver.solve()
         self.assertEquals(faulty_set, g.faulty_set, "Should find all nodes from faulty set %s, got only %s" %
                           (g.faulty_set, faulty_set))
@@ -83,59 +83,48 @@ class Test(unittest.TestCase):
         self.assertEquals(statistics.get_var('negative'), 1, "Should have 1 negative queries in total got %d" % (statistics.get_var('negative'),))
 
     def test_brute_force_solver2(self):
-        g = nx.DiGraph()
-        g.add_edge(1,2)
-        g.add_edge(2,4)
-        g.add_edge(1,3)
-        g.add_edge(3,4)
-        g.add_edge(3,5)
-        g.add_edge(5,4)
-
+        g = self._createBaseGraph([(1,2),(2,4),(1,3),(3,4),(3,5),(5,4)])
         graph = base_types.ProblemGraph(g, 1, 4)
-        problem = base_types.GCGTProblem(graph, {5}, None)
+        problem = base_types.GCGTProblem([1,2,3,4,5], {5}, None, graph)
         statistics = base_types.TestStatistics()
         tester = non_overlapping_set_tester.NonOverlappingSetTester(problem.faulty_set, statistics)
-        solver = brute_force_solver.BruteForceGCGTSolver(problem, tester)
+        solver = iterative_solvers.BruteForceGCGTSolver(problem, tester)
         faulty_set = solver.solve()
         self.assertEqual(faulty_set, {5})
 
+    def test_random_solver(self):
+        g = self._createBaseGraph([(1,2),(2,4),(1,3),(3,4),(3,5),(5,4)])
+        graph = base_types.ProblemGraph(g, 1, 4)
+        problem = base_types.GCGTProblem([1,2,3,4,5], {5}, None, graph)
+        statistics = base_types.TestStatistics()
+        tester = non_overlapping_set_tester.NonOverlappingSetTester(problem.faulty_set, statistics)
+        solver = iterative_solvers.RandomSolver(1, problem, tester)
+        faulty_set = solver.solve()
+        self.assertEqual(faulty_set, {5})
+
+
     def test_is_dag_connected(self):
-        g = nx.DiGraph()
-        g.add_edge(1,2)
-        g.add_edge(2,3)
-        g.add_edge(1,3)
-        g.add_edge(4,5)
+        g = self._createBaseGraph([(1,2),(2,3),(1,3),(4,5)])
         self.assertFalse(nx.is_weakly_connected(g))
 
     def test_is_not_consistent_dag_weakly_connected(self):
-        g = nx.DiGraph()
-        g.add_edge(1,2)
-        g.add_edge(1,3)
+        g = self._createBaseGraph([(1,2),(1,3)])
         self.assertTrue(nx.is_weakly_connected(g))
 
     def test_is_not_consistent_dag_marked_not_consistent(self):
-        g = nx.DiGraph()
-        g.add_edge(1,2)
-        g.add_edge(1,3)
+        g = self._createBaseGraph([(1,2),(1,3)])
         with self.assertRaises(test_graph_generator.TestGraphException):
             test_graph_generator.get_start_stop_vertex(g)
 
     def test_is_consistent_dag_marked_consistent(self):
-        g = nx.DiGraph()
-        g.add_edge(1,2)
-        g.add_edge(1,3)
-        g.add_edge(2,4)
-        g.add_edge(3,4)
+        g = self._createBaseGraph([(1,2), (1,3), (2,4), (3,4)])
         self.assertEqual(test_graph_generator.get_start_stop_vertex(g), (1,4))
 
     def test_generate_paths_generates_whole_path(self):
-        g = nx.DiGraph()
-        g.add_edge(1,2)
-        g.add_edge(2,3)
-        g.add_edge(3,4)
-        all_paths = list(brute_force_solver.generate_paths(g, 1,4))
+        g = self._createBaseGraph([(1,2),(2,3),(3,4)])
+        all_paths = list(graph_utils.generate_paths(g, 1,4))
         self.assertEqual(len(all_paths), 1)
-        self.assertEqual([1,2,3,4], list(brute_force_solver.generate_paths(g, 1,4))[0])
+        self.assertEqual([1,2,3,4], list(graph_utils.generate_paths(g, 1,4))[0])
 
     def test_simple_raw_testing_problem_is_solved_by_hamming(self):
         problem = problem_io.read_problem_from_file_of_name("test_data/test_gen1.json")
@@ -145,16 +134,19 @@ class Test(unittest.TestCase):
         faulty_set = solver.solve()
         self.assertEquals(faulty_set, problem.faulty_set, "Should find all nodes from faulty set %s, got only %s" %
                           (problem.faulty_set, faulty_set))
-        #self.assertEquals(statistics.get_var('all'), 8, "Should have 8 queries in total got %d" % (statistics.get_var('all'),))
+        self.assertEquals(statistics.get_var('all'), 15, "Should have 15 queries in total got %d" % (statistics.get_var('all'),))
         #self.assertEquals(statistics.get_var('positive'), 7, "Should have 7 positive queries in total got %d" % (statistics.get_var('positive'),))
         #self.assertEquals(statistics.get_var('negative'), 1, "Should have 1 negative queries in total got %d" % (statistics.get_var('negative'),))
 
 
     @attr('slow')
     def test_run_experiments(self):
-        bruteForceFactory = brute_force_solver.BruteForceGCGTSolver
+        bruteForceFactory = iterative_solvers.BruteForceGCGTSolver
         experimentStats = brute_force_experiments.SimpleExperimentStats()
         run_simple_experiment.run_experiment_for_json_directory([bruteForceFactory], experimentStats, directoryPath='test_data/experiment1')
+
+    def _createBaseGraph(self, edgeList):
+        return nx.DiGraph(edgeList)
 
 
 if __name__ == "__main__":

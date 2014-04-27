@@ -18,11 +18,15 @@ GROUP_TESTING_PROBLEM_TAG = "group testing problem"
 CURRENT_VERSION = "0.1"
 
 
+
+
+
 def read_graph_group_testing(data):
     faulty_set = set(data[NODES_TAG])
     problem_graph = _create_problem_graph(data[GRAPH_TAG])
+    all_nodes = _get_graph_nodes(problem_graph)
     description = "".join(data.get(DESCRIPTION_TAG, ''))
-    problem = base_types.GCGTProblem(problem_graph, faulty_set, description)
+    problem = base_types.GCGTProblem(all_nodes, faulty_set, description, problem_graph)
     return problem
 
 def read_group_testing(data):
@@ -84,3 +88,6 @@ def _create_problem_graph(data_source):
     sink = data_source[SINK_NODE_TAG]
     problem_graph = base_types.ProblemGraph(graph, source, sink)
     return problem_graph
+
+def _get_graph_nodes(problem_graph):
+    return problem_graph.graph.nodes()
