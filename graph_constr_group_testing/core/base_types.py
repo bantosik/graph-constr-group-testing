@@ -22,30 +22,45 @@ Problem = collections.namedtuple("Problem", ["all_nodes", "faulty_set", "descrip
 GCGTProblem = collections.namedtuple("GCGTProblem", ["all_nodes", "faulty_set", "description", "problem_graph"])
 ProblemGraph = collections.namedtuple("ProblemGraph", ["graph", "source", "sink"])
 
-def size_of_problem(problem):
-    return problem.problem_graph.graph.number_of_nodes() - 2
-
-
-from abc import abstractmethod, ABCMeta
-
-class Verificator(object):
-    @abstractmethod
-    def verify(self, result, faulty_set):
-        raise NotImplementedError()
-
 
 class ExperimentStatistics(object):
     """
     Maintains statistics related with the experiment, for each problem and solver statistics object is gathered
     """
-    __metaclass__ = ABCMeta
 
-    def __init__(self):
+    def __init__(self, rendererMapping):
+        self._renderers = rendererMapping
+        for k, v in self._renderers.iteritems():
+            if v is None:
+                self._renderers[k] = lambda x: x.toDict()
+
         self.results = []
+        self.headers = set({})
 
-    def set_result(self, solver, problem, statistics):
-        self.results.append((solver, problem, statistics))
+    def set_result(self, objectsMapping):
+        result = {}
+        for k, v in objectsMapping.iteritems():
+            rendered = self._render(k, v)
+            self._add_headers(rendered)
+            result.update(rendered)
+        self.results.append(result)
 
+    def _add_headers(self, rendered):
+        for k in rendered:
+            self.headers.add(k)
+
+    def _render(self, rendererIdentifier, obj):
+        result = {}
+        renderer = self._renderers.get(rendererIdentifier, lambda obj: obj.toDict())
+        for k, v in renderer(obj).iteritems():
+            result[self._join(rendererIdentifier, k)] = v
+        return result
+
+    def _join(self, *args):
+        return ".".join(args)
+
+    def process(self):
+        raise NotImplementedError()
 
 class TestStatistics(object):
     """
@@ -63,8 +78,13 @@ class TestStatistics(object):
     def inc_var(self, var):
         self.variable_dict[var] = self.variable_dict.get(var, 0) + 1
 
+    def toDict(self):
+        return self.variable_dict
+
 
 class Solver(object):
+    SOLVER_TYPE_TAG = 'solver_type'
+
     def __init__(self, problem_description, tester, *args, **kwargs):
         raise NotImplementedError()
 
@@ -86,6 +106,7 @@ class GCGTSolver(Solver):
 
     Problem description and tester object have to be inserted in constructor
     """
+
     def __init__(self, problem_description, tester, *args, **kwargs):
         """
         :param problem_description: graph constrained combinatorial problem description

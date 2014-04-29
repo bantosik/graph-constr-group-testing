@@ -1,10 +1,6 @@
 import collections
+import csv
 from graph_constr_group_testing.core import base_types
-
-
-class SimpleExperimentStats(base_types.Verificator, base_types.ExperimentStatistics):
-    def verify(self, result, faulty_set):
-        return result == faulty_set
 
 def averageQueriesForSize(results):
     result = []
@@ -19,4 +15,13 @@ def averageQueriesForSize(results):
         result.append((k, float(v)/count[k]))
     return zip(*sorted(result, key=lambda x: x[0]))
 
+class CsvStats(base_types.ExperimentStatistics):
+    def __init__(self, renderers, csvFileName):
+        super(CsvStats, self).__init__(renderers)
+        self._fileName = csvFileName
 
+    def process(self):
+        with open(self._fileName, 'wc') as csvFile:
+            writer = csv.DictWriter(csvFile, list(self.headers))
+            writer.writeheader()
+            writer.writerows(self.results)

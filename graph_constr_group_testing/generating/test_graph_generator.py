@@ -58,4 +58,4 @@ def generate_random_problem_description(n, d):
     #first generate random dag
     problemGraph = generate_connected_dag(n + 2)
     f_nodes = faulty_nodes(problemGraph, d)
-    return base_types.GCGTProblem(problem_graph=problemGraph, faulty_set=f_nodes, description=None)
+    return base_types.GCGTProblem(all_nodes=problemGraph.graph.nodes(), problem_graph=problemGraph, faulty_set=f_nodes, description=None)

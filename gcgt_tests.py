@@ -7,7 +7,7 @@ import networkx as nx
 from graph_constr_group_testing.io import problem_json_io as problem_io
 from graph_constr_group_testing.core import base_types, non_overlapping_set_tester
 from graph_constr_group_testing import iterative_solvers, hamming_solver, graph_utils
-from graph_constr_group_testing import brute_force_experiments, run_simple_experiment
+from graph_constr_group_testing import results_analyser, runners
 from graph_constr_group_testing.generating import test_graph_generator
 
 
@@ -98,7 +98,7 @@ class Test(unittest.TestCase):
         problem = base_types.GCGTProblem([1,2,3,4,5], {5}, None, graph)
         statistics = base_types.TestStatistics()
         tester = non_overlapping_set_tester.NonOverlappingSetTester(problem.faulty_set, statistics)
-        solver = iterative_solvers.RandomSolver(1, problem, tester)
+        solver = iterative_solvers.RandomSolver(1, 1000, problem, tester)
         faulty_set = solver.solve()
         self.assertEqual(faulty_set, {5})
 
@@ -138,12 +138,12 @@ class Test(unittest.TestCase):
         #self.assertEquals(statistics.get_var('positive'), 7, "Should have 7 positive queries in total got %d" % (statistics.get_var('positive'),))
         #self.assertEquals(statistics.get_var('negative'), 1, "Should have 1 negative queries in total got %d" % (statistics.get_var('negative'),))
 
-
+    @unittest.skip("Add proper experiment result gatherer")
     @attr('slow')
     def test_run_experiments(self):
         bruteForceFactory = iterative_solvers.BruteForceGCGTSolver
-        experimentStats = brute_force_experiments.SimpleExperimentStats()
-        run_simple_experiment.run_experiment_for_json_directory([bruteForceFactory], experimentStats, directoryPath='test_data/experiment1')
+        experimentStats = results_analyser.SimpleExperimentStats()
+        runners.run_experiment_for_json_directory([bruteForceFactory], experimentStats, directoryPath='test_data/experiment1')
 
     def _createBaseGraph(self, edgeList):
         return nx.DiGraph(edgeList)

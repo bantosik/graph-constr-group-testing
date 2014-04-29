@@ -1,15 +1,14 @@
 import collections
 import os
+from graph_constr_group_testing import verificators
 from graph_constr_group_testing.core import base_types, non_overlapping_set_tester
 from graph_constr_group_testing.io import problem_io, problem_json_io
 
 
-def sameSize(problemIterable):
-    result = collections.defaultdict(list)
-    for problem in problemIterable:
-        result[problem.nodes_number()].append(problem)
-    return result
-
+SOLVER_TAG = 'solver'
+PROBLEM_TAG = 'problem'
+STATISTICS_TAG = 'statistics'
+PROBLEM_ID_TAG = 'problem_id_tag'
 
 def run_experiment(solverFactories, problemIterable, experimentStats):
     """
@@ -23,15 +22,20 @@ def run_experiment(solverFactories, problemIterable, experimentStats):
     :param experimentStats: object storing results for each pair solver, problem
     :type :
     """
+    listOfProblems = list(problemIterable)
     for solverFactory in solverFactories:
-        for problem in problemIterable:
+        problemId = 0
+        for problem in listOfProblems:
             statistics = base_types.TestStatistics()
             tester = non_overlapping_set_tester.NonOverlappingSetTester(problem.faulty_set, statistics)
             solver = solverFactory(problem, tester)
-            result = solver.solve()
-            statistics.set_var('result', experimentStats.verify(result, problem.faulty_set))
-            experimentStats.set_result(solver, problem, statistics)
-
+            try:
+                result = verificators.verify(solver.solve(), problem.faulty_set)
+            except base_types.SolverError:
+                result = "ERROR"
+            statistics.set_var('result', result)
+            experimentStats.set_result({SOLVER_TAG: solver, PROBLEM_TAG: problem, STATISTICS_TAG: statistics, PROBLEM_ID_TAG: problemId})
+            problemId += 1
 
 def iterate_for_problems(directoryPath, decoder):
     dirpath = os.path.realpath(directoryPath)
