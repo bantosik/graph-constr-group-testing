@@ -1,1 +1,1 @@
-{"graph": {"sink_node": "5", "edges": {"1": ["2", "5"], "0": ["1", "2", "3", "5"], "3": ["4", "5"], "2": ["3", "5"], "5": [], "4": ["5"]}, "source_node": "0"}, "version": "0.1", "type": "group testing problem", "faulty_nodes": ["1"]}
+{"graph": {"sink_node": "5", "edges": {"1": ["2", "5"], "0": ["1", "2", "3", "5"], "3": ["4", "5"], "2": ["3", "5"], "5": [], "4": ["5"]}, "source_node": "0"}, "version": "0.1", "type": "graph constr group testing problem", "faulty_nodes": ["1"]}

@@ -17,10 +17,28 @@ Experiment runner is a function accepting :class:`Experiment` parameter that fil
 """
 
 import collections
+from abc import ABCMeta, abstractmethod
 
-Problem = collections.namedtuple("Problem", ["all_nodes", "faulty_set", "description"])
-GCGTProblem = collections.namedtuple("GCGTProblem", ["all_nodes", "faulty_set", "description", "problem_graph"])
+
+class ToDict(object):
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def toDict(self):
+        raise NotImplementedError()
+
+class EmptyToDict(ToDict):
+    def toDict(self):
+        return {}
+
+class Problem(collections.namedtuple("Problem", ["all_nodes", "faulty_set", "description"]), EmptyToDict):
+    pass
+
+class GCGTProblem(collections.namedtuple("GCGTProblem", ["all_nodes", "faulty_set", "description", "problem_graph"]), EmptyToDict):
+    pass
+
 ProblemGraph = collections.namedtuple("ProblemGraph", ["graph", "source", "sink"])
+
 
 
 class ExperimentStatistics(object):
@@ -29,7 +47,7 @@ class ExperimentStatistics(object):
     """
 
     def __init__(self, rendererMapping):
-        self._renderers = rendererMapping
+        self._renderers = rendererMapping or {}
         for k, v in self._renderers.iteritems():
             if v is None:
                 self._renderers[k] = lambda x: x.toDict()
@@ -41,6 +59,7 @@ class ExperimentStatistics(object):
         result = {}
         for k, v in objectsMapping.iteritems():
             rendered = self._render(k, v)
+
             self._add_headers(rendered)
             result.update(rendered)
         self.results.append(result)
@@ -51,7 +70,11 @@ class ExperimentStatistics(object):
 
     def _render(self, rendererIdentifier, obj):
         result = {}
-        renderer = self._renderers.get(rendererIdentifier, lambda obj: obj.toDict())
+        if isinstance(obj, (int, float, str)):
+            defaultrenderer = lambda x: {'value': x}
+        else:
+            defaultrenderer = lambda obj: obj.toDict()
+        renderer = self._renderers.get(rendererIdentifier, defaultrenderer)
         for k, v in renderer(obj).iteritems():
             result[self._join(rendererIdentifier, k)] = v
         return result
@@ -62,7 +85,7 @@ class ExperimentStatistics(object):
     def process(self):
         raise NotImplementedError()
 
-class TestStatistics(object):
+class TestStatistics(ToDict):
     """
     Maintains various statistics related with the single run of group testing algorithm
     """
@@ -82,7 +105,7 @@ class TestStatistics(object):
         return self.variable_dict
 
 
-class Solver(object):
+class Solver(ToDict):
     SOLVER_TYPE_TAG = 'solver_type'
 
     def __init__(self, problem_description, tester, *args, **kwargs):

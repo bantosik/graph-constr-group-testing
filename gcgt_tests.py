@@ -31,6 +31,7 @@ class Test(unittest.TestCase):
         self.problem1_graph.add_edge("6", "END")
 
 
+
     def test_read_problem_from_file(self):
         g = problem_io.read_problem_from_file_of_name("test_data/test1.json")
         self.assertEquals(g.faulty_set, {"1","3","5"}, "Faulty set read from problem description %s" % (g.faulty_set,))
@@ -138,12 +139,21 @@ class Test(unittest.TestCase):
         #self.assertEquals(statistics.get_var('positive'), 7, "Should have 7 positive queries in total got %d" % (statistics.get_var('positive'),))
         #self.assertEquals(statistics.get_var('negative'), 1, "Should have 1 negative queries in total got %d" % (statistics.get_var('negative'),))
 
-    @unittest.skip("Add proper experiment result gatherer")
     @attr('slow')
     def test_run_experiments(self):
         bruteForceFactory = iterative_solvers.BruteForceGCGTSolver
-        experimentStats = results_analyser.SimpleExperimentStats()
+        experimentStats = results_analyser.PandasStats()
         runners.run_experiment_for_json_directory([bruteForceFactory], experimentStats, directoryPath='test_data/experiment1')
+        df = experimentStats.get_dataframe()
+        self.assertEqual(df.columns.values.tolist(), ['problem_id_tag.value',
+                                                      'solver.solver_type',
+                                                      'statistics.all',
+                                                      'statistics.negative',
+                                                      'statistics.positive',
+                                                      'statistics.result',
+                                                      'statistics.tests' ])
+        self.assertEqual(len(df.index), 480) #there are 480 instances of problem
+
 
     def _createBaseGraph(self, edgeList):
         return nx.DiGraph(edgeList)

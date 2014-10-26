@@ -26,3 +26,6 @@ class HammingGroupTestingSolver(base_types.Solver):
         result_column = run_tests_according_to_matrix(disjunct_matrix, assignment, self.tester)
         row = recovery.recover_from_disjunct(disjunct_matrix, result_column, 2)
         return {assignment[index] for index in row}
+
+    def toDict(self):
+        return {base_types.Solver.SOLVER_TYPE_TAG: 'hammingsolver'}

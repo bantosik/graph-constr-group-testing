@@ -6,9 +6,13 @@ from graph_constr_group_testing.core import base_types
 
 
 class IterativeSolver(base_types.GCGTSolver):
+    path_generator = None
     def __init__(self, problem_description, tester):
         super(IterativeSolver, self).__init__(problem_description, tester)
         self.analysis_state = IterativeSolver.SimpleStateAnalyser(problem_description)
+
+    def stop(self):
+        raise NotImplementedError()
 
     def solve(self):
         iteration = 0
@@ -56,8 +60,6 @@ class BruteForceGCGTSolver(IterativeSolver):
     def __init__(self, problem_description, tester):
         super(BruteForceGCGTSolver, self).__init__(problem_description, tester)
         self.path_generator = graph_utils.generate_paths(self.graph, self.source, self.sink)
-
-
 
     def toDict(self):
         return {base_types.Solver.SOLVER_TYPE_TAG: 'bruteforce'}
